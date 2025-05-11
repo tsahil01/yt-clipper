@@ -241,7 +241,7 @@ export default function ClipForm() {
             {youtubeId && (
               <div className="space-y-6">
                 <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
-                  <div id="youtube-player"></div>
+                  <div id="youtube-player" className="w-full h-full"></div>
                   {!isVideoLoaded && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
@@ -269,14 +269,6 @@ export default function ClipForm() {
                         <span>Duration: {formatTime(range[1] - range[0])}</span>
                       </div>
                       
-                      <Slider
-                        value={range}
-                        min={0}
-                        max={duration}
-                        step={0.1}
-                        onValueChange={handleRangeChange}
-                        className="py-4"
-                      />
                       
                       <div className="w-full bg-slate-800 h-1 relative">
                         <div 
@@ -291,6 +283,15 @@ export default function ClipForm() {
                           style={{ left: `${duration > 0 && currentTime !== null ? (currentTime / duration) * 100 : 0}%` }}
                         />
                       </div>
+
+                      <Slider
+                        value={range}
+                        min={0}
+                        max={duration}
+                        step={0.1}
+                        onValueChange={handleRangeChange}
+                        className="py-4"
+                      />
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
