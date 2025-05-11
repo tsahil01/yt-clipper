@@ -5,4 +5,4 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const backendUrl = "http://localhost:8080";
+export const backendUrl = import.meta.env.VITE_BACKEND_URL;
