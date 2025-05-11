@@ -23,6 +23,10 @@ const qualitySettings = {
   "360p": { height: 360, crf: 24 }
 };
 
+app.get("/", (req: any, res: any) => {
+  res.json({ message: "Hello, world!" });
+});
+
 app.post("/clip", async (req: any, res: any) => {
   const { url, start, end, quality = "1080p" } = req.body;
   
