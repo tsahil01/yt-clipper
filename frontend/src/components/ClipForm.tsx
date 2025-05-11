@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { YTPlayer } from "@/lib/types";
-
+import { backendUrl } from "@/lib/utils";
 const getYoutubeId = (url: string) => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
@@ -212,7 +212,7 @@ export default function ClipForm() {
     setProgress({});
 
     try {
-      const res = await fetch("http://localhost:3001/clip", {
+      const res = await fetch(`${backendUrl}/clip`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -240,35 +240,43 @@ export default function ClipForm() {
 
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg shadow-md p-8">
-          <h2 className="text-xl font-bold text-zinc-100 mb-8 text-center">YouTube Video Clipper</h2>
-
+    <div className="py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800/50 rounded-2xl shadow-2xl p-8 hover:shadow-amber-500/5 transition-all duration-300">
           <div className="space-y-8">
-            <div className="flex space-x-2">
-              <Input
-                id="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://www.youtube.com/watch?v=..."
-                className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200"
-              />
+            <div className="flex space-x-3">
+              <div className="relative flex-1 group">
+                <Input
+                  id="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="Paste YouTube URL here..."
+                  className="bg-zinc-800/50 border-zinc-700/50 text-zinc-100 placeholder:text-zinc-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all duration-200 rounded-xl pl-4 pr-12 group-hover:bg-zinc-800/70"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <div className="w-6 h-6 rounded-full bg-amber-500/10 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  </div>
+                </div>
+              </div>
               <Button
                 onClick={loadVideo}
-                className="bg-amber-600 hover:bg-amber-700 text-zinc-100 transition-all duration-200"
+                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-zinc-100 transition-all duration-200 rounded-xl px-6 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:scale-105"
               >
                 Load Video
               </Button>
             </div>
 
             {youtubeId && (
-              <div className="space-y-8">
-                <div className="aspect-video bg-black rounded-md overflow-hidden relative border border-zinc-800 shadow-md">
+              <div className="space-y-8 animate-fade-in">
+                <div className="aspect-video bg-black rounded-xl overflow-hidden relative border border-zinc-800/50 shadow-2xl group hover:shadow-amber-500/10 transition-all duration-300">
                   <div id="youtube-player" className="w-full h-full"></div>
                   {!isVideoLoaded && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/90">
-                      <Loader2 className="w-10 h-10 animate-spin text-amber-500" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/90 backdrop-blur-sm">
+                      <div className="relative">
+                        <Loader2 className="w-10 h-10 animate-spin text-amber-500" />
+                        <div className="absolute inset-0 bg-amber-500/20 blur-xl rounded-full animate-pulse" />
+                      </div>
                     </div>
                   )}
 
@@ -277,7 +285,7 @@ export default function ClipForm() {
                       <Button
                         size="icon"
                         onClick={togglePlay}
-                        className="bg-zinc-800 hover:bg-zinc-700 text-zinc-100 rounded-full shadow-md transition-all duration-200"
+                        className="bg-zinc-800/80 hover:bg-zinc-700 text-zinc-100 rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:shadow-amber-500/20"
                       >
                         {isPlaying ? <Pause size={18} /> : <Play size={18} />}
                       </Button>
@@ -289,22 +297,26 @@ export default function ClipForm() {
                   <div className="space-y-8">
                     <div className="space-y-4">
                       <div className="flex justify-between text-sm text-zinc-400">
-                        <span>
+                        <span className="font-medium flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                           Clip Range: {formatTime(range[0])} - {formatTime(range[1])}
                         </span>
-                        <span>Duration: {formatTime(range[1] - range[0])}</span>
+                        <span className="font-medium flex items-center gap-2">
+                          Duration: {formatTime(range[1] - range[0])}
+                          <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                        </span>
                       </div>
 
-                      <div className="w-full bg-zinc-800 h-1.5 rounded-full relative">
+                      <div className="w-full bg-zinc-800/50 h-2 rounded-full relative group">
                         <div
-                          className="absolute h-1.5 rounded-full bg-amber-600"
+                          className="absolute h-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 group-hover:from-amber-400 group-hover:to-amber-500 transition-all duration-300"
                           style={{
                             left: `${duration > 0 ? (range[0] / duration) * 100 : 0}%`,
                             width: `${duration > 0 ? ((range[1] - range[0]) / duration) * 100 : 0}%`,
                           }}
                         />
                         <div
-                          className="absolute w-3 h-3 bg-amber-500 rounded-full -mt-0.75 shadow-md transform -translate-x-1/2"
+                          className="absolute w-4 h-4 bg-amber-500 rounded-full -mt-1 shadow-lg transform -translate-x-1/2 hover:scale-110 transition-transform cursor-grab active:cursor-grabbing"
                           style={{
                             left: `${duration > 0 && currentTime !== null ? (currentTime / duration) * 100 : 0}%`,
                           }}
@@ -322,8 +334,8 @@ export default function ClipForm() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label htmlFor="start" className="block text-sm font-medium text-zinc-300">
+                      <div className="space-y-2 group">
+                        <label htmlFor="start" className="block text-sm font-medium text-zinc-300 group-hover:text-amber-500 transition-colors">
                           Start Time (seconds)
                         </label>
                         <Input
@@ -336,14 +348,14 @@ export default function ClipForm() {
                               handleRangeChange([newStart, range[1]])
                             }
                           }}
-                          className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200"
+                          className="bg-zinc-800/50 border-zinc-700/50 text-zinc-100 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all duration-200 rounded-xl group-hover:bg-zinc-800/70"
                           step="0.1"
                           min="0"
                           max={duration > 0 ? (range[1] - 0.1).toFixed(1) : "0"}
                         />
                       </div>
-                      <div className="space-y-2">
-                        <label htmlFor="end" className="block text-sm font-medium text-zinc-300">
+                      <div className="space-y-2 group">
+                        <label htmlFor="end" className="block text-sm font-medium text-zinc-300 group-hover:text-amber-500 transition-colors">
                           End Time (seconds)
                         </label>
                         <Input
@@ -356,7 +368,7 @@ export default function ClipForm() {
                               handleRangeChange([range[0], newEnd])
                             }
                           }}
-                          className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200"
+                          className="bg-zinc-800/50 border-zinc-700/50 text-zinc-100 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all duration-200 rounded-xl group-hover:bg-zinc-800/70"
                           step="0.1"
                           min={duration > 0 ? (range[0] + 0.1).toFixed(1) : "0"}
                           max={duration.toFixed(1)}
@@ -364,15 +376,15 @@ export default function ClipForm() {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label htmlFor="quality" className="block text-sm font-medium text-zinc-300">
+                    <div className="space-y-2 group">
+                      <label htmlFor="quality" className="block text-sm font-medium text-zinc-300 group-hover:text-amber-500 transition-colors">
                         Output Quality
                       </label>
                       <Select value={quality} onValueChange={setQuality}>
-                        <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100 focus:ring-amber-500 focus:border-amber-500">
+                        <SelectTrigger className="bg-zinc-800/50 border-zinc-700/50 text-zinc-100 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 rounded-xl group-hover:bg-zinc-800/70">
                           <SelectValue placeholder="Select quality" />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-800 border-zinc-700">
+                        <SelectContent className="bg-zinc-800/90 border-zinc-700/50 backdrop-blur-sm">
                           <SelectItem value="1080p">1080p (Full HD)</SelectItem>
                           <SelectItem value="720p">720p (HD)</SelectItem>
                           <SelectItem value="480p">480p (SD)</SelectItem>
@@ -384,7 +396,7 @@ export default function ClipForm() {
                     <Button
                       onClick={handleClip}
                       disabled={loading || !isVideoLoaded}
-                      className="w-full bg-amber-600 hover:bg-amber-700 text-zinc-100 disabled:opacity-50 transition-all duration-200 shadow-md"
+                      className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-zinc-100 disabled:opacity-50 transition-all duration-200 rounded-xl shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 py-6 text-lg font-medium hover:scale-[1.02]"
                     >
                       {loading ? (
                         <span className="flex items-center justify-center">
@@ -405,12 +417,14 @@ export default function ClipForm() {
                     {loading && (
                       <div className="mt-4 space-y-2">
                         {progress.download && (
-                          <div className="text-sm text-zinc-400">
+                          <div className="text-sm text-zinc-400 font-medium flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                             Download Progress: {progress.download}
                           </div>
                         )}
                         {progress.clip && (
-                          <div className="text-sm text-zinc-400">
+                          <div className="text-sm text-zinc-400 font-medium flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                             Clipping Progress: {progress.clip}
                           </div>
                         )}
@@ -423,12 +437,12 @@ export default function ClipForm() {
 
             {videoUrl && (
               <div className="mt-8 space-y-6 animate-fade-in">
-                <div className="aspect-video bg-black rounded-md overflow-hidden border border-zinc-800 shadow-md">
+                <div className="aspect-video bg-black rounded-xl overflow-hidden border border-zinc-800/50 shadow-2xl group hover:shadow-amber-500/10 transition-all duration-300">
                   <video src={videoUrl} controls className="w-full h-full" />
                 </div>
                 <Button
                   asChild
-                  className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 transition-all duration-200 shadow-md"
+                  className="w-full bg-zinc-800/50 hover:bg-zinc-800 text-zinc-100 transition-all duration-200 rounded-xl shadow-lg py-6 text-lg font-medium hover:scale-[1.02] hover:shadow-amber-500/10"
                 >
                   <a href={videoUrl} download="clip.mp4" className="flex items-center justify-center">
                     <Download className="mr-2 h-5 w-5" />
