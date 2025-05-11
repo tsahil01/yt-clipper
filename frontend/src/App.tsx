@@ -1,4 +1,4 @@
-import ClipForm from "./ClipForm";
+import ClipForm from "./components/ClipForm";
 
 function App() {
   return <ClipForm />;
